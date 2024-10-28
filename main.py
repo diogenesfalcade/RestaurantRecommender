@@ -5,7 +5,7 @@ import time
 import requests
 
 # Sua chave de API do TripAdvisor
-api_key = 'B5ED6E59DFA441218729F6DD42F21094'
+api_key = ''
 
 # Endpoint base da API do TripAdvisor
 url = 'https://api.tripadvisor.com/api/endpoint_que_você_deseja_utilizar'
