@@ -4,8 +4,16 @@ import time
 
 import requests
 
+url = "https://api.content.tripadvisor.com/api/v1/location/search?key=64958C6CE3974BFA98E78B49E69F06B8&searchQuery=Curitiba&language=en"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
 # Sua chave de API do TripAdvisor
-api_key = ''
+api_key = '64958C6CE3974BFA98E78B49E69F06B8'
 
 # Endpoint base da API do TripAdvisor
 url = 'https://api.tripadvisor.com/api/endpoint_que_você_deseja_utilizar'
