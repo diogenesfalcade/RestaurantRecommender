@@ -1,73 +1,101 @@
 import googlemaps
 import time
 import pandas as pd
-from textblob import TextBlob
-from nltk.sentiment import SentimentIntensityAnalyzer
 
-# API do Google Maps
-api_key = "AIzaSyAnarAqn6NUl3qScGwo1ZbVFzwvTDpcax4"
-gmaps = googlemaps.Client(key=api_key)
+gmaps = googlemaps.Client(key='AIzaSyAnarAqn6NUl3qScGwo1ZbVFzwvTDpcax4')
+bairros = ['Ahú',
+           'Alto da Glória',
+           'Alto da XV',
+           'Batel',
+           'Bigorrilho',
+           'Bom Retiro',
+           'Cabral',
+           'Centro',
+           'Centro Cívico',
+           'Cristo Rei',
+           'Hugo Lange',
+           'Jardim Botânico',
+           'Jardim Social',
+           'Juvevê',
+           'Mercês',
+           'Prado Velho',
+           'Rebouças',
+           'São Francisco']
+restaurants = []
 
-# Obter o place_id do local
-lugar = 'Gianttura Ristorante'
-resultado = gmaps.places(query=lugar)
+def restaurant_response(response_items, tag):
+    restaurant_responses = []
+    for item in response_items:
+        item_dict = {}
+        item_dict['tag'], item_dict['name'], item_dict['place_id'], item_dict['price_level'], item_dict['rating'], item_dict['user_ratings_total'] = tag, item.get('name'), item.get('place_id'), item.get('price_level'), item.get('rating'), item.get('user_ratings_total')
+        restaurant_responses.append(item_dict)
+    return restaurant_responses
 
-# Pega o place_id do primeiro resultado
-if resultado['results']:
-    place_id = resultado['results'][0]['place_id']
+for bairro in bairros:
+    query_bairro = bairro + " curitiba"
+    place = gmaps.geocode(query_bairro)
+    place_info = place[0]
+    geo_results = place_info['geometry']
+    geo_coordinates = geo_results['location']
+    lat = geo_coordinates['lat']
+    lng = geo_coordinates['lng']
+    flag = False
+    counter = 0
+    while flag == False:
+        if counter == 0:
+            results = gmaps.places(type="restaurant", location=[lat, lng], radius=3000)
+            response_items = results['results']
+            restaurants.extend(restaurant_response(response_items, bairro))
+            counter += 1
+        else:
+            if results.get('next_page_token') is None:
+                flag = True
+            else:
+                next_page = results.get('next_page_token')
+                time.sleep(2)
+                results = gmaps.places(type="restaurant", location=[lat, lng], radius=2000, page_token=next_page)
+                response_items = results['results']
+                restaurants.extend(restaurant_response(response_items, bairro))
+                counter += 1
 
-# Obter a primeira página de reviews
-detalhes_lugar = gmaps.place(place_id=place_id, fields=['name', 'rating', 'reviews'])
+tipo_restaurante = ['tradicional', 
+                    'mexicana', 
+                    'latino', 
+                    'hamburger', 
+                    'pizzaria', 
+                    'alta gastronomia', 
+                    'americano', 
+                    'italiano', 
+                    'turco', 
+                    'mediterraneano', 
+                    'chines', 
+                    'asiático', 
+                    'indiano', 
+                    'japones']
 
-
-# Armazena e exibe as reviews da primeira página
-if 'result' in detalhes_lugar:
-    lugar_info = detalhes_lugar['result']
-    print(f"Nome: {lugar_info.get('name')}")
-
-    # Itera sobre as reviews e armazena
-    all_reviews = lugar_info.get('reviews', [])
-
-    # Força uma nova página
-    next_page_token = detalhes_lugar.get('next_page_token')
-
-    # Se houver mais páginas, faz novas requisições
-    while next_page_token:
-        time.sleep(2)  # Aguarde um pouco antes de usar o token (isso é recomendado)
-        detalhes_lugar = gmaps.place(place_id=place_id, fields=['reviews'], page_token=next_page_token)
-        more_reviews = detalhes_lugar.get('result', {}).get('reviews', [])
-        all_reviews.extend(more_reviews)
-        next_page_token = detalhes_lugar.get('next_page_token')
-
-    # Exibe as reviews obtidas
-    for review in all_reviews:
-        print(f"Autor: {review['author_name']}, Nota: {review['rating']}, Comentário: {review['text']}\n")
-
-def get_all_reviews(place_id, gmaps):
-    all_reviews = []
-    detalhes_lugar = gmaps.place(place_id=place_id, fields=['reviews', 'name'])
-
-    if 'result' in detalhes_lugar:
-        lugar_info = detalhes_lugar['result']
-        print(f"Nome: {lugar_info.get('name')}")
-        all_reviews.extend(lugar_info.get('reviews', []))
-
-        # tenta pegar a próxima página
-        next_page_token = detalhes_lugar.get('next_page_token')
-        while next_page_token:
-            time.sleep(3)  # Aguardar token
-
-            # Faz a nova requisição para a próxima página
-            detalhes_lugar = gmaps.place(place_id=place_id, fields=['reviews'], page_token=next_page_token)
-            more_reviews = detalhes_lugar.get('result', {}).get('reviews', [])
-            all_reviews.extend(more_reviews)
-            next_page_token = detalhes_lugar.get('next_page_token')
-
-    return all_reviews
-
-def print_reviews(reviews):
-    for review in reviews:
-        print(f"Autor: {review.get('author_name')}, Nota: {review.get('rating')}, Comentário: {review.get('text')}\n")
-
-reviews = get_all_reviews(place_id, gmaps)
-print_reviews(reviews)
+place = gmaps.geocode("Curitiba")
+place_info = place[0]
+geo_results = place_info['geometry']
+geo_coordinates = geo_results['location']
+lat = geo_coordinates['lat']
+lng = geo_coordinates['lng']
+for tipo in tipo_restaurante:
+    print(len(restaurants))
+    flag = False
+    counter = 0
+    while flag == False:
+        if counter == 0:
+            results = gmaps.places(query=(tipo, "restaurantes em Curitiba"), type="restaurant", location=[lat, lng])
+            response_items = results['results']
+            restaurants.extend(restaurant_response(response_items, tipo))
+            counter += 1
+        else:
+            if results.get('next_page_token') is None:
+                flag = True
+            else:
+                next_page = results.get('next_page_token')
+                time.sleep(2)
+                results = gmaps.places(query=(tipo, "restaurantes em Curitiba"), type="restaurant", location=[lat, lng], page_token=next_page)
+                response_items = results['results']
+                restaurants.extend(restaurant_response(response_items, tipo))
+                counter += 1
