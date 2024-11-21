@@ -2,11 +2,10 @@ import requests
 import json
 import pandas as pd
 
-def tripadvisor(__self__):
-    __self__.api_key = '64958C6CE3974BFA98E78B49E69F06B8'
-    __self__.lang = 'pt'
+api_key = '64958C6CE3974BFA98E78B49E69F06B8'
+lang = 'pt'
 
-def locationId(query, lang, api_key):
+def locationId(query):
     query.replace(" ", "%20")  
     url = f"https://api.content.tripadvisor.com/api/v1/location/search?key={api_key}&searchQuery={query}&language={lang}"
     headers = {"accept": "application/json"}
@@ -43,8 +42,10 @@ def locationId(query, lang, api_key):
     #melhorar código para achar a localização correta
     locationId = df.loc[df['Name'] == query, 'Location Id'].iloc[0]
 
-def getReviews(lang, locationId, apiKey):
-    url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/reviews?language={lang}&key={apiKey}"
+    return locationId
+
+def getReviews(locationId):
+    url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/reviews?language={lang}&key={api_key}"
     headers = {"accept": "application/json"}
     response = requests.get(url, headers=headers)
 
@@ -57,8 +58,8 @@ def getReviews(lang, locationId, apiKey):
     all_reviews = []
     i = 1
 
-    # pegar até 5 páginas de requisição
-    while i < 5:
+    paginas = 25
+    while i < paginas:
         i= i + 1
         params = {
             'limit': limit,

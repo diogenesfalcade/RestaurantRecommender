@@ -1,4 +1,6 @@
+import pandas as pd
 import psycopg2
+from sqlalchemy import create_engine
 
 def query(command):
     try:
@@ -25,3 +27,9 @@ def query(command):
             connection.close()
 
     return result
+
+def insert_db(restaurants):
+    rest_df = pd.DataFrame(restaurants)
+    rest_df = rest_df.drop_duplicates(subset=['place_id'])
+    engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
+    rest_df.to_sql('gmaps_restaurants', con=engine, if_exists='replace', index=False)
