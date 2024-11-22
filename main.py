@@ -1,12 +1,13 @@
 import pandas as pd
 import googlemaps
 import functions.locations_maps as maps
-import functions.query_data as qry
+import functions.utilities as util
+from sqlalchemy import create_engine
+
+update = False
+engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
 
 if __name__ == "__main__":
-
-    update = False
-
     if update:
         cidade = 'Curitiba'
         # bairros = ['Ahú', 'Alto da Glória', 'Alto da XV', 'Batel', 'Bigorrilho', 'Bom Retiro',
@@ -18,5 +19,13 @@ if __name__ == "__main__":
                         'koren barbecue', 'izakaya', 'feijoada', 'risotto', 'focaccia', 'parmegiana', 'trattoria', 'ristorante']
 
         restaurants = maps.getRestaurantsByType(cidade, tipo_restaurante)
-        qry.insert_db(restaurants)
+        util.insert_db(restaurants)
+
+    # Defina a query desejada
+    query = "SELECT name FROM gmaps_restaurants"
+
+    # Use pd.read_sql para executar a query e carregar os resultados em um DataFrame
+    df = pd.read_sql(query, con=engine)
+
     
+

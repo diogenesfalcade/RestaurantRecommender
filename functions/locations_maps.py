@@ -50,7 +50,7 @@ def getRestaurantsNeighborhood(neighborhoods: list, city: str):
     neighborhoods: list
         user defined list of neighborhoods to search restaurants
 
-    city: st
+    city: str
         string of the city to search for restaurants
         you may include the state or country acronym such as Curitiba - PR, Brasil
     '''
@@ -93,7 +93,16 @@ def getRestaurantsNeighborhood(neighborhoods: list, city: str):
                     counter += 1
 
 def getRestaurantsByType(city, typesOfRestaurants):
+    '''
+    Uses the list of types of restaurants to search for places in the city
 
+    typesOfRestaurants: list
+        user defined list of types of restaurants
+
+    city: str
+        city to search for restaurants
+        you may include the state or country acronym such as Curitiba - PR, Brasil
+    '''
     restaurants = []
     place = gmaps.geocode(city)
     place_info = place[0]
@@ -107,7 +116,7 @@ def getRestaurantsByType(city, typesOfRestaurants):
         counter = 0
         while flag == False:
             if counter == 0:
-                results = gmaps.places(query=(type, "restaurantes em ", city), type="restaurant", location=[lat, lng])
+                results = gmaps.places(query=(type, " restaurantes em ", city), type="restaurant", location=[lat, lng])
                 response_items = results['results']
                 restaurants.extend(restaurantResponse(response_items, type))
                 counter += 1
@@ -117,7 +126,7 @@ def getRestaurantsByType(city, typesOfRestaurants):
                 else:
                     next_page = results.get('next_page_token')
                     time.sleep(2)
-                    results = gmaps.places(query=(type, "restaurantes em", city), type="restaurant", location=[lat, lng], page_token=next_page)
+                    results = gmaps.places(query=(type, " restaurantes em ", city), type="restaurant", location=[lat, lng], page_token=next_page)
                     response_items = results['results']
                     restaurants.extend(restaurantResponse(response_items, type))
                     counter += 1
