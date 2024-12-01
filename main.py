@@ -20,16 +20,16 @@ if __name__ == "__main__":
                         'koren barbecue', 'izakaya', 'feijoada', 'risotto', 'focaccia', 'parmegiana', 'trattoria', 'ristorante']
 
         restaurants = maps.getRestaurantsByType(cidade, tipo_restaurante)
-        util.insertDb(restaurants)
+        util.insertDb(tableName='gmaps_restaurants', data=restaurants, dropDuplicatesBy = 'place_id')
 
     # Get all the restaurant names
-    query = "SELECT name FROM gmaps_restaurants"
+    query = "SELECT name, latitude, longitude FROM gmaps_restaurants limit 10"
     df = pd.read_sql(query, con=engine)
-    restaurants = pd.Series(df['name'].values)
 
-    for restaurant in restaurants:
-        locationId = rev.locationId(restaurant)
+    for row in df.itertuples():
+        locationId, dfplaces = rev.locationId(row.name, row.latitude, row.longitude)
+        util.insertDb('ta_location', dfplaces, 'Location Id')
+        if locationId != 0:
+            reviews = rev.getReviews(locationId)
+            util.insertDb('ta_reviews', reviews)
     
-
-    
-

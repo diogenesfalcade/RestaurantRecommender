@@ -73,8 +73,14 @@ def query(command):
 
     return result
 
-def insertDb(restaurants):
-    rest_df = pd.DataFrame(restaurants)
-    rest_df = rest_df.drop_duplicates(subset=['place_id'])
+def insertDb(tableName, data, dropDuplicatesBy=None, method='append'):
+    rest_df = pd.DataFrame(data)
+
+    if dropDuplicatesBy and dropDuplicatesBy not in rest_df.columns:
+        raise ValueError(f"Coluna '{dropDuplicatesBy}' não encontrada no DataFrame.")
+
+    if dropDuplicatesBy:
+        rest_df = rest_df.drop_duplicates(subset=[dropDuplicatesBy])
+
     engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
-    rest_df.to_sql('gmaps_restaurants', con=engine, if_exists='replace', index=False)
+    rest_df.to_sql(tableName, con=engine, if_exists = method, index=False)

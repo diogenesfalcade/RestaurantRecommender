@@ -1,16 +1,16 @@
 import requests
 import json
 import pandas as pd
+import Levenshtein
 
 api_key = '64958C6CE3974BFA98E78B49E69F06B8'
 lang = 'pt'
 
-def locationId(query):
-    query.replace(" ", "%20")  
-    url = f"https://api.content.tripadvisor.com/api/v1/location/search?key={api_key}&searchQuery={query}&language={lang}"
+def locationId(name, lat, long):
+    name.replace(" ", "%20")  
+    url = f'https://api.content.tripadvisor.com/api/v1/location/search?key={api_key}&searchQuery=%7B{name}%7D&category=restaurants&latLong={lat}%2C{long}&language={lang}'
     headers = {"accept": "application/json"}
     response = requests.get(url, headers=headers)
-    print(response.text)
     data = json.loads(response.text)
     locationsIds = []
     names = []
@@ -39,61 +39,118 @@ def locationId(query):
         'Address': addresses
     })
 
-    #melhorar código para achar a localização correta
-    locationId = df.loc[df['Name'] == query, 'Location Id'].iloc[0]
+    try:
+        locationId = df.loc[df['Name'] == name, 'Location Id'].iloc[0]
+    except:
+        names = pd.Series(df['Name'].values)
+        ratio = 0.0
+        for place in names:
+            newRatio = Levenshtein.ratio(name,place, score_cutoff=0.9)
+            if newRatio > ratio:
+                ratio = newRatio
+                mostRelevant = place
+            
+        if ratio != 0.0:
+            locationId = df.loc[df['Name'] == mostRelevant, 'Location Id'].iloc[0]
+        else:
+            return 0, df
 
-    return locationId
+    return locationId, df
 
 def getReviews(locationId):
     url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/reviews?language={lang}&key={api_key}"
     headers = {"accept": "application/json"}
-    response = requests.get(url, headers=headers)
-
+    
     # Parâmetros iniciais
     limit = 5
     offset = 0
-    headers = {
-        'Accept': 'application/json'
-    }
     all_reviews = []
+    max_pages = 100  # Máximo de páginas
     i = 1
 
-    paginas = 25
-    while i < paginas:
-        i= i + 1
-        params = {
-            'limit': limit,
-            'offset': offset
-        }
-
+    while i <= max_pages:
+        params = {'limit': limit, 'offset': offset}
         response = requests.get(url, headers=headers, params=params)
 
-        # Verificando se a resposta foi bem-sucedida
         if response.status_code == 200:
             data = response.json()
 
-            # Adicionando reviews à lista
-            all_reviews.extend(data.get('data', []))
+            # Adiciona reviews à lista
+            reviews = data.get('data', [])
+            all_reviews.extend(reviews)
 
-            # Verifica se há mais reviews a serem obtidos
-            if len(data.get('data', [])) < limit:
-                break  # Sai do loop quando não houver mais reviews
+            # Exibe logs para depuração
+            print(f"Página: {i}, Offset: {offset}, Reviews retornados: {len(reviews)}")
 
-            # Aumenta o offset para a próxima página
+            # Verifica se há mais reviews
+            if len(reviews) < limit:
+                print("Sem mais reviews disponíveis.")
+                break
+
+            # Incrementa offset e contador de páginas
             offset += limit
+            i += 1
         else:
             print(f"Erro na requisição: {response.status_code}")
             break
 
-    # Exibindo o total de reviews obtidos
-    print(f'Total de reviews obtidos: {len(all_reviews)}')
+    print(f"Total de reviews obtidos: {len(all_reviews)}")
 
+    # Criando listas para cada coluna que será incluída no DataFrame
+    ids = []
+    lang_list = []
+    location_id_list = []
+    published_date = []
+    rating = []
     review_texts = []
     review_titles = []
+    trip_type = []
+    travel_date = []
+    usernames = []
+    user_location_ids = []
+    user_location_names = []
+    subrating_cost = []
+    subrating_service = []
+    subrating_food = []
+
+    # Extraindo os dados dos reviews
     for review in all_reviews:
+        ids.append(review.get('id', ''))
+        lang_list.append(review.get('lang', ''))
+        location_id_list.append(review.get('location_id', ''))
+        published_date.append(review.get('published_date', ''))
+        rating.append(review.get('rating', ''))
         review_texts.append(review.get('text', ''))
         review_titles.append(review.get('title', ''))
+        trip_type.append(review.get('trip_type', ''))
+        travel_date.append(review.get('travel_date', ''))
+        usernames.append(review['user'].get('username', '') if review.get('user') else '')
+        user_location_ids.append(review['user']['user_location'].get('id', '') if review.get('user', {}).get('user_location') else '')
+        user_location_names.append(review['user']['user_location'].get('name', '') if review.get('user', {}).get('user_location') else '')
 
-    df_reviews = pd.DataFrame({'Review Text': review_texts, 'Review Title': review_titles})
+        # Subratings (avalições detalhadas)
+        subratings = review.get('subratings', {})
+        subrating_cost.append(subratings.get('0', {}).get('value', ''))
+        subrating_service.append(subratings.get('1', {}).get('value', ''))
+        subrating_food.append(subratings.get('2', {}).get('value', ''))
+
+    # Criando o DataFrame com todas as colunas
+    df_reviews = pd.DataFrame({
+        'Review ID': ids,
+        'Language': lang_list,
+        'Location ID': location_id_list,
+        'Published Date': published_date,
+        'Rating': rating,
+        'Review Text': review_texts,
+        'Review Title': review_titles,
+        'Trip Type': trip_type,
+        'Travel Date': travel_date,
+        'Username': usernames,
+        'User Location ID': user_location_ids,
+        'User Location Name': user_location_names,
+        'Subrating Cost': subrating_cost,
+        'Subrating Service': subrating_service,
+        'Subrating Food': subrating_food,
+    })
 
     return df_reviews
