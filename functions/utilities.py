@@ -5,7 +5,7 @@ from deep_translator import GoogleTranslator
 from nltk.tokenize import sent_tokenize
 import sys
 
-def translate_text(paragraph):
+def translateText(paragraph):
     """Wrapper for Google Translate with upload workaround.
     
     Collects chuncks of senteces below limit to translate.
@@ -73,7 +73,7 @@ def query(command):
 
     return result
 
-def insert_db(restaurants):
+def insertDb(restaurants):
     rest_df = pd.DataFrame(restaurants)
     rest_df = rest_df.drop_duplicates(subset=['place_id'])
     engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')

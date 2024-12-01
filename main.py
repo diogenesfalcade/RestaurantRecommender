@@ -2,6 +2,7 @@ import pandas as pd
 import googlemaps
 import functions.locations_maps as maps
 import functions.utilities as util
+import functions.reviews as rev
 from sqlalchemy import create_engine
 
 update = False
@@ -15,17 +16,20 @@ if __name__ == "__main__":
         #     'Jardim Social', 'Juvevê', 'Mercês', 'Prado Velho', 'Rebouças', 'São Francisco']
         tipo_restaurante = ['tradicional', 'mexicana', 'latino', 'hamburger', 'pizzaria', 'alta gastronomia', 'americano', 'italiano', 
                         'turco', 'mediterraneano', 'chines', 'asiático', 'indiano', 'japones', 'brasileiro', 'árabe', 'vegetariano', 
-                        'peruano', 'tailandês', 'pub', 'steakhouse', 'churrascaria', 'rodízio','fast food', 'yakisoba', 'ramem', 
+                        'peruano', 'tailandês', 'pub', 'steakhouse', 'churrascaria', 'carne', 'churrasco', 'rodízio','fast food', 'yakisoba', 'ramem', 
                         'koren barbecue', 'izakaya', 'feijoada', 'risotto', 'focaccia', 'parmegiana', 'trattoria', 'ristorante']
 
         restaurants = maps.getRestaurantsByType(cidade, tipo_restaurante)
-        util.insert_db(restaurants)
+        util.insertDb(restaurants)
 
-    # Defina a query desejada
+    # Get all the restaurant names
     query = "SELECT name FROM gmaps_restaurants"
-
-    # Use pd.read_sql para executar a query e carregar os resultados em um DataFrame
     df = pd.read_sql(query, con=engine)
+    restaurants = pd.Series(df['name'].values)
+
+    for restaurant in restaurants:
+        locationId = rev.locationId(restaurant)
+    
 
     
 

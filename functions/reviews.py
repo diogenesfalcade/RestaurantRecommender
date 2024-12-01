@@ -95,3 +95,5 @@ def getReviews(locationId):
         review_titles.append(review.get('title', ''))
 
     df_reviews = pd.DataFrame({'Review Text': review_texts, 'Review Title': review_titles})
+
+    return df_reviews
