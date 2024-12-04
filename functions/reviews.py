@@ -30,19 +30,19 @@ def locationId(name, lat, long):
         addresses.append(place['address_obj'].get('address_string', 'N/A'))
 
     df = pd.DataFrame({
-        'Location Id': locationsIds,
-        'Name': names,
-        'City':cities,
-        'State': states,
-        'Country': countries,
-        'Postal Code': postalCodes,
-        'Address': addresses
+        'location_id': locationsIds,
+        'name': names,
+        'city':cities,
+        'state': states,
+        'country': countries,
+        'postal_code': postalCodes,
+        'address': addresses
     })
 
     try:
-        locationId = df.loc[df['Name'] == name, 'Location Id'].iloc[0]
+        locationId = df.loc[df['name'] == name, 'location_id'].iloc[0]
     except:
-        names = pd.Series(df['Name'].values)
+        names = pd.Series(df['name'].values)
         ratio = 0.0
         for place in names:
             newRatio = Levenshtein.ratio(name,place, score_cutoff=0.9)
@@ -51,7 +51,7 @@ def locationId(name, lat, long):
                 mostRelevant = place
             
         if ratio != 0.0:
-            locationId = df.loc[df['Name'] == mostRelevant, 'Location Id'].iloc[0]
+            locationId = df.loc[df['name'] == mostRelevant, 'location_id'].iloc[0]
         else:
             return 0, df
 
@@ -136,21 +136,21 @@ def getReviews(locationId):
 
     # Criando o DataFrame com todas as colunas
     df_reviews = pd.DataFrame({
-        'Review ID': ids,
-        'Language': lang_list,
-        'Location ID': location_id_list,
-        'Published Date': published_date,
-        'Rating': rating,
-        'Review Text': review_texts,
-        'Review Title': review_titles,
-        'Trip Type': trip_type,
-        'Travel Date': travel_date,
-        'Username': usernames,
-        'User Location ID': user_location_ids,
-        'User Location Name': user_location_names,
-        'Subrating Cost': subrating_cost,
-        'Subrating Service': subrating_service,
-        'Subrating Food': subrating_food,
+        'review_id': ids,
+        'language': lang_list,
+        'location_id': location_id_list,
+        'published_date': published_date,
+        'rating': rating,
+        'review_text': review_texts,
+        'review_title': review_titles,
+        'trip_type': trip_type,
+        'travel_date': travel_date,
+        'username': usernames,
+        'user_location_id': user_location_ids,
+        'user_location_name': user_location_names,
+        'subrating_cost': subrating_cost,
+        'subrating_service': subrating_service,
+        'subrating_food': subrating_food,
     })
 
     return df_reviews

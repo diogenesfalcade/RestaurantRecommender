@@ -1,9 +1,11 @@
 import pandas as pd
 import psycopg2
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from deep_translator import GoogleTranslator
 from nltk.tokenize import sent_tokenize
-import sys
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def translateText(paragraph):
     """Wrapper for Google Translate with upload workaround.
@@ -73,7 +75,28 @@ def query(command):
 
     return result
 
-def insertDb(tableName, data, dropDuplicatesBy=None, method='append'):
+# def insertDb(tableName, data, dropDuplicatesBy=None, method='append'):
+#     rest_df = pd.DataFrame(data)
+
+#     if dropDuplicatesBy and dropDuplicatesBy not in rest_df.columns:
+#         raise ValueError(f"Coluna '{dropDuplicatesBy}' não encontrada no DataFrame.")
+
+#     if dropDuplicatesBy:
+#         rest_df = rest_df.drop_duplicates(subset=[dropDuplicatesBy])
+
+#     engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
+#     rest_df.to_sql(tableName, con=engine, if_exists = method, index=False)
+
+def insertDb(tableName, data, dropDuplicatesBy=None, primaryKey=None):
+    """
+    Insere dados no banco de dados PostgreSQL com controle de duplicatas.
+
+    Args:
+        tableName (str): Nome da tabela no banco de dados.
+        data (list[dict] | DataFrame): Dados a serem inseridos.
+        dropDuplicatesBy (str): Coluna para eliminar duplicatas antes da inserção (opcional).
+        primaryKey (str): Nome da chave primária para gerenciar duplicatas (obrigatório para evitar conflitos).
+    """
     rest_df = pd.DataFrame(data)
 
     if dropDuplicatesBy and dropDuplicatesBy not in rest_df.columns:
@@ -82,5 +105,37 @@ def insertDb(tableName, data, dropDuplicatesBy=None, method='append'):
     if dropDuplicatesBy:
         rest_df = rest_df.drop_duplicates(subset=[dropDuplicatesBy])
 
+    if primaryKey is None:
+        raise ValueError("A chave primária (primaryKey) deve ser especificada para gerenciar duplicatas.")
+
+    temp_table = f"{tableName}_temp"
     engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
-    rest_df.to_sql(tableName, con=engine, if_exists = method, index=False)
+
+    with engine.connect() as connection:
+        try:
+            # Inserir dados na tabela temporária
+            rest_df.to_sql(temp_table, con=connection, if_exists='replace', index=False)
+            logging.info(f"Dados inseridos na tabela temporária '{temp_table}' com sucesso.")
+
+            # Inserir na tabela final
+            insert_query = f"""
+            INSERT INTO {tableName} ({', '.join(rest_df.columns)})
+            SELECT {', '.join(rest_df.columns)}
+            FROM {temp_table}
+            ON CONFLICT ({primaryKey}) DO NOTHING;
+            """
+            logging.info(f"Executando o comando: {insert_query}")
+            result = connection.execute(text(insert_query))
+            logging.info(f"Linhas afetadas: {result.rowcount}")
+
+            # Confirmar transação
+            connection.commit()
+            logging.info("Transação confirmada com sucesso.")
+
+        except Exception as e:
+            logging.error(f"Erro durante a inserção: {e}")
+            connection.rollback()  # Reverter alterações em caso de erro
+        finally:
+            # Limpar tabela temporária
+            connection.execute(text(f"DROP TABLE IF EXISTS {temp_table}"))
+            logging.info(f"Tabela temporária '{temp_table}' descartada com sucesso.")

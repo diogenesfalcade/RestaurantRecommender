@@ -1,5 +1,4 @@
 import pandas as pd
-import googlemaps
 import functions.locations_maps as maps
 import functions.utilities as util
 import functions.reviews as rev
@@ -23,13 +22,14 @@ if __name__ == "__main__":
         util.insertDb(tableName='gmaps_restaurants', data=restaurants, dropDuplicatesBy = 'place_id')
 
     # Get all the restaurant names
-    query = "SELECT name, latitude, longitude FROM gmaps_restaurants limit 10"
+    query = "SELECT name, latitude, longitude FROM gmaps_restaurants"
     df = pd.read_sql(query, con=engine)
 
     for row in df.itertuples():
         locationId, dfplaces = rev.locationId(row.name, row.latitude, row.longitude)
-        util.insertDb('ta_location', dfplaces, 'Location Id')
+        util.insertDb('ta_location', dfplaces, dropDuplicatesBy='location_id', primaryKey='location_id')
         if locationId != 0:
             reviews = rev.getReviews(locationId)
-            util.insertDb('ta_reviews', reviews)
+            util.insertDb('ta_reviews', reviews, primaryKey='review_id')
+    
     
