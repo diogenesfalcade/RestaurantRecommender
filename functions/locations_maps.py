@@ -5,8 +5,6 @@ from sqlalchemy import create_engine
 
 gmaps = googlemaps.Client(key='AIzaSyB0NvzEDi2PqEI4CDO_Ys_Z0cYM1CFhNvA')
 
-
-
 def restaurantResponse(responseItem, tag: str):
     ''' 
     Get only defined items from the request and trannform into a python dict
@@ -103,6 +101,7 @@ def getRestaurantsByType(city, typesOfRestaurants):
         city to search for restaurants
         you may include the state or country acronym such as Curitiba - PR, Brasil
     '''
+
     restaurants = []
     place = gmaps.geocode(city)
     place_info = place[0]
@@ -131,3 +130,13 @@ def getRestaurantsByType(city, typesOfRestaurants):
                     restaurants.extend(restaurantResponse(response_items, type))
                     counter += 1
     return restaurants
+
+
+def searchRestaurants(tripAdvRestName):
+    #Incomplete
+    place = gmaps.geocode(tripAdvRestName)
+    place_info = place[0]
+    geo_results = place_info['geometry']
+    geo_coordinates = geo_results['location']
+    lat = geo_coordinates['lat']
+    lng = geo_coordinates['lng']

@@ -8,11 +8,10 @@ update = False
 engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
 
 if __name__ == "__main__":
+
+    # Get locations from gmaps api -> Around 900 restaurants
     if update:
         cidade = 'Curitiba'
-        # bairros = ['Ahú', 'Alto da Glória', 'Alto da XV', 'Batel', 'Bigorrilho', 'Bom Retiro',
-        #     'Cabral', 'Centro', 'Centro Cívico', 'Cristo Rei', 'Hugo Lange', 'Jardim Botânico',
-        #     'Jardim Social', 'Juvevê', 'Mercês', 'Prado Velho', 'Rebouças', 'São Francisco']
         tipo_restaurante = ['tradicional', 'mexicana', 'latino', 'hamburger', 'pizzaria', 'alta gastronomia', 'americano', 'italiano', 
                         'turco', 'mediterraneano', 'chines', 'asiático', 'indiano', 'japones', 'brasileiro', 'árabe', 'vegetariano', 
                         'peruano', 'tailandês', 'pub', 'steakhouse', 'churrascaria', 'carne', 'churrasco', 'rodízio','fast food', 'yakisoba', 'ramem', 
@@ -21,15 +20,15 @@ if __name__ == "__main__":
         restaurants = maps.getRestaurantsByType(cidade, tipo_restaurante)
         util.insertDb(tableName='gmaps_restaurants', data=restaurants, dropDuplicatesBy = 'place_id')
 
-    # Get all the restaurant names
-    query = "SELECT name, latitude, longitude FROM gmaps_restaurants"
-    df = pd.read_sql(query, con=engine)
-
-    for row in df.itertuples():
-        locationId, dfplaces = rev.locationId(row.name, row.latitude, row.longitude)
-        util.insertDb('ta_location', dfplaces, dropDuplicatesBy='location_id', primaryKey='location_id')
-        if locationId != 0:
-            reviews = rev.getReviews(locationId)
-            util.insertDb('ta_reviews', reviews, primaryKey='review_id')
+    # Get all the restaurant from TripAdvisor based on gmaps first search
+    if update:
+        query = "SELECT name, latitude, longitude FROM gmaps_restaurants"
+        df = pd.read_sql(query, con=engine)
+        for row in df.itertuples():
+            locationId, dfplaces = rev.locationId(row.name, row.latitude, row.longitude)
+            util.insertDb('ta_location', dfplaces, dropDuplicatesBy='location_id', primaryKey='location_id')
+            if locationId != 0:
+                reviews = rev.getReviews(locationId)
+                util.insertDb('ta_reviews', reviews, primaryKey='review_id')
     
     
