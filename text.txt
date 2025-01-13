@@ -1,18 +1,243 @@
-{'business_status': 'OPERATIONAL', 
-'formatted_address': 'R. José Sabóia Cortês, 383 - Centro Cívico, Curitiba - PR, 80530-000, Brazil',
- 'geometry': {'location': {'lat': -25.4073203, 'lng': -49.2706383}, 
-'viewport': {'northeast': {'lat': -25.40588882010728, 'lng': -49.26930507010728}, 'southwest': {'lat': -25.40858847989272, 'lng': -49.27200472989272}}}, 
-'icon': 'https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png', 
-'icon_background_color': '#FF9E67', 
-'icon_mask_base_uri': 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet', 
-'name': 'Zapata Mexican Bar', 
-'opening_hours': {'open_now': True}, 
-'photos': [{'height': 3024, 'html_attributions': ['<a href="https://maps.google.com/maps/contrib/103646444353897132278">lunobili</a>'], 
-'photo_reference': 'AdDdOWoLfjF6wzAwTpN5hrX4JhcSOfRXm8Uwmz2u_EdTK6LMaxamYWo1L2lGWkRFDgi36Cp2xyAVvuyRCeg6Qqp_ygSbKqqGhxdK3kJZi13LFOtGTT14TidMlRojLvylgfsfPBkqAJwWJY9gWxR0ghKcIuOw9mDM936OVAPv_0fSzmjbXaFQ', 'width': 4032}], 
-'place_id': 'ChIJZ3L57Kbm3JQRW9a4XGDqyi4', 
-'plus_code': {'compound_code': 'HPVH+3P Centro Cívico, Curitiba - State of Paraná', 'global_code': '586GHPVH+3P'}, 
-'price_level': 2, 
-'rating': 4.6, 
-'reference': 'ChIJZ3L57Kbm3JQRW9a4XGDqyi4', 
-'types': ['bar', 'restaurant', 'food', 'point_of_interest', 'establishment'], 
-'user_ratings_total': 8633}
+{
+  "location_id": "15795056",
+  "name": "Souq Curitiba",
+  "description": "O maior e mais completo e moderno espaço de gastronomia e entretenimento de curitiba, desde dezembro 2018. Promovemos entretenimento e levamos diversão por meio de shows, aulas, cursos, feiras, danças, oficinas, apresentações,… Siga no instagram: @souqcuritiba",
+  "web_url": "https://www.tripadvisor.com.br/Restaurant_Review-g303441-d15795056-Reviews-Souq-Curitiba_State_of_Parana.html?m=66827",
+  "address_obj": {
+    "street1": "Av. Iguaçu, 4399",
+    "street2": "",
+    "city": "Curitiba",
+    "state": "Paraná",
+    "country": "Brasil",
+    "postalcode": "80240-074",
+    "address_string": "Av. Iguaçu, 4399, Curitiba, Paraná 80240-074 Brasil"
+  },
+  "ancestors": [
+    {
+      "level": "City",
+      "name": "Curitiba",
+      "location_id": "303441"
+    },
+    {
+      "abbrv": "PR",
+      "level": "State",
+      "name": "Paraná",
+      "location_id": "303435"
+    },
+    {
+      "level": "Country",
+      "name": "Brasil",
+      "location_id": "294280"
+    }
+  ],
+  "latitude": "-25.454927",
+  "longitude": "-49.30254",
+  "timezone": "America/Sao_Paulo",
+  "email": "contato@souqcuritiba.com.br",
+  "phone": "+55 41 99542-4307",
+  "website": "http://souqcuritiba.com.br/",
+  "write_review": "https://www.tripadvisor.com.br/UserReview-g303441-d15795056-Souq-Curitiba_State_of_Parana.html?m=66827",
+  "ranking_data": {
+    "geo_location_id": "303441",
+    "ranking_string": "Nº 321 de 6.160 Lugares Para Comer em Curitiba",
+    "geo_location_name": "Curitiba",
+    "ranking_out_of": "6160",
+    "ranking": "321"
+  },
+  "rating": "4.0",
+  "rating_image_url": "https://www.tripadvisor.com.br/img/cdsi/img2/ratings/traveler/4.0-66827-5.svg",
+  "num_reviews": "68",
+  "review_rating_count": {
+    "1": "0",
+    "2": "8",
+    "3": "6",
+    "4": "23",
+    "5": "31"
+  },
+  "subratings": {
+    "0": {
+      "name": "rate_food",
+      "localized_name": "Comida",
+      "rating_image_url": "https://static.tacdn.com/img2/ratings/traveler/ss4.0.svg",
+      "value": "4.0"
+    },
+    "1": {
+      "name": "rate_service",
+      "localized_name": "Atendimento",
+      "rating_image_url": "https://static.tacdn.com/img2/ratings/traveler/ss4.0.svg",
+      "value": "4.0"
+    },
+    "2": {
+      "name": "rate_value",
+      "localized_name": "Custo",
+      "rating_image_url": "https://static.tacdn.com/img2/ratings/traveler/ss4.0.svg",
+      "value": "4.0"
+    }
+  },
+  "photo_count": "61",
+  "see_all_photos": "https://www.tripadvisor.com.br/Restaurant_Review-g303441-d15795056-m66827-Reviews-Souq-Curitiba_State_of_Parana.html#photos",
+  "price_level": "$$ - $$$",
+  "hours": {
+    "periods": [
+      {
+        "open": {
+          "day": 2,
+          "time": "1700"
+        },
+        "close": {
+          "day": 2,
+          "time": "2300"
+        }
+      },
+      {
+        "open": {
+          "day": 3,
+          "time": "1700"
+        },
+        "close": {
+          "day": 3,
+          "time": "2300"
+        }
+      },
+      {
+        "open": {
+          "day": 4,
+          "time": "1700"
+        },
+        "close": {
+          "day": 4,
+          "time": "2300"
+        }
+      },
+      {
+        "open": {
+          "day": 5,
+          "time": "1700"
+        },
+        "close": {
+          "day": 5,
+          "time": "2300"
+        }
+      },
+      {
+        "open": {
+          "day": 6,
+          "time": "1100"
+        },
+        "close": {
+          "day": 6,
+          "time": "2300"
+        }
+      },
+      {
+        "open": {
+          "day": 7,
+          "time": "1100"
+        },
+        "close": {
+          "day": 7,
+          "time": "2200"
+        }
+      }
+    ],
+    "weekday_text": [
+      "Monday: Closed",
+      "Tuesday: 17:00 - 23:00",
+      "Wednesday: 17:00 - 23:00",
+      "Thursday: 17:00 - 23:00",
+      "Friday: 17:00 - 23:00",
+      "Saturday: 11:00 - 23:00",
+      "Sunday: 11:00 - 22:00"
+    ]
+  },
+  "features": [
+    "Aceita cartão de crédito",
+    "Entrega",
+    "Pagamento digital",
+    "Permite cães",
+    "Balcão externo",
+    "Familiar",
+    "Wi-fi gratuito",
+    "Bar completo",
+    "Cadeiras para bebês",
+    "Música ao vivo",
+    "Restaurantes para não-fumantes",
+    "Mesas ao ar livre",
+    "Estacionamento disponível",
+    "Áreas de lazer",
+    "Restaurante privativo",
+    "Lugares para sentar",
+    "Serve bebida alcoólica",
+    "Estacionamento na rua",
+    "Para levar",
+    "Televisão",
+    "Estacionamento com validação",
+    "Acesso para cadeirantes",
+    "Vinho e cerveja"
+  ],
+  "cuisine": [
+    {
+      "name": "mexican",
+      "localized_name": "Mexicana"
+    },
+    {
+      "name": "barbecue",
+      "localized_name": "Churrasco"
+    },
+    {
+      "name": "asian",
+      "localized_name": "Asiática"
+    },
+    {
+      "name": "sushi",
+      "localized_name": "Sushi"
+    },
+    {
+      "name": "italian",
+      "localized_name": "Italiana"
+    },
+    {
+      "name": "bar",
+      "localized_name": "Bar"
+    }
+  ],
+  "category": {
+    "name": "restaurant",
+    "localized_name": "Restaurante"
+  },
+  "subcategory": [
+    {
+      "name": "sit_down",
+      "localized_name": "Sit down"
+    }
+  ],
+  "neighborhood_info": [],
+  "trip_types": [
+    {
+      "name": "business",
+      "localized_name": "Negócios",
+      "value": "0"
+    },
+    {
+      "name": "couples",
+      "localized_name": "Romântica",
+      "value": "7"
+    },
+    {
+      "name": "solo",
+      "localized_name": "Viagem individual",
+      "value": "0"
+    },
+    {
+      "name": "family",
+      "localized_name": "Família",
+      "value": "15"
+    },
+    {
+      "name": "friends",
+      "localized_name": "Viagem com amigos",
+      "value": "27"
+    }
+  ],
+  "awards": []
+}

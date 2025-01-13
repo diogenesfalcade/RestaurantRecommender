@@ -113,7 +113,7 @@ def getReviews(locationId):
     subrating_service = []
     subrating_food = []
 
-    # Extraindo os dados dos reviews
+    # Extraindo os dados das reviews
     for review in all_reviews:
         ids.append(review.get('id', ''))
         lang_list.append(review.get('lang', ''))
@@ -154,3 +154,93 @@ def getReviews(locationId):
     })
 
     return df_reviews
+
+
+
+def getLocationDetails(locationId, api_key, lang="pt_BR"):
+    url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/details?key={api_key}&language={lang}&currency=BRL"
+    headers = {"accept": "application/json"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Verifica se a requisição foi bem-sucedida
+        locationDetails = response.json()  # Converte diretamente para JSON
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar detalhes da localização {locationId}: {e}")
+        return pd.DataFrame()  # Retorna um DataFrame vazio em caso de erro
+
+    # Extraindo os dados de forma segura
+    location_id = locationDetails.get('location_id', '')
+    name = locationDetails.get('name', '')
+    description = locationDetails.get('description', '')
+    email = locationDetails.get('email', '')
+    website = locationDetails.get('website', '')
+
+    # Ranking
+    ranking_data = locationDetails.get('ranking_data', {})
+    ranking_position = ranking_data.get('ranking', '')
+    ranking_out_of = ranking_data.get('ranking_out_of', '')
+
+    # Avaliações
+    rating = locationDetails.get('rating', '')
+    num_reviews = locationDetails.get('num_reviews', '')
+
+    # Contagem de avaliações por nota (1 a 5 estrelas)
+    review_rating = locationDetails.get('review_rating_count', {})
+    review_rating_1 = review_rating.get('1', '')
+    review_rating_2 = review_rating.get('2', '')
+    review_rating_3 = review_rating.get('3', '')
+    review_rating_4 = review_rating.get('4', '')
+    review_rating_5 = review_rating.get('5', '')
+
+    # Subratings (Comida, Atendimento, Custo, etc.)
+    subratings = locationDetails.get('subratings', {})
+    food_rating = subratings.get("0", {}).get("value", "")
+    service_rating = subratings.get("1", {}).get("value", "")
+    value_rating = subratings.get("2", {}).get("value", "")
+
+    # Outras informações
+    price_level = locationDetails.get('price_level', '')
+
+    # Horários de funcionamento (garante que seja lista)
+    hours = locationDetails.get('hours', {})
+    weekdays_opening_hours = hours.get('weekday_text', [])
+
+    # Características, Culinárias, Categorias, Subcategorias, Tipos de Viagem (garante que seja lista)
+    features = locationDetails.get('features', [])
+    cuisines = [cuisine.get('localized_name', '') for cuisine in locationDetails.get('cuisine', [])]
+    categories = [category.get('localized_name', '') for category in locationDetails.get('category', [])]
+    subcategories = [subcategory.get('localized_name', '') for subcategory in locationDetails.get('subcategory', [])]
+    trip_types = [tripType.get('localized_name', '') for tripType in locationDetails.get('trip_types', [])]
+
+    # Criando o DataFrame
+    df_location_details = pd.DataFrame([{
+        'location_id': location_id,
+        'name': name,
+        'description': description,
+        'email': email,
+        'website': website,
+        'ranking_position': ranking_position,
+        'ranking_out_of': ranking_out_of,
+        'rating': rating,
+        'num_reviews': num_reviews,
+        'review_rating_1': review_rating_1,
+        'review_rating_2': review_rating_2,
+        'review_rating_3': review_rating_3,
+        'review_rating_4': review_rating_4,
+        'review_rating_5': review_rating_5,
+        'food_rating': food_rating,
+        'service_rating': service_rating,
+        'value_rating': value_rating,
+        'price_level': price_level,
+        'weekdays_opening_hours': weekdays_opening_hours,
+        'features': features,
+        'cuisines': cuisines,
+        'categories': categories,
+        'subcategories': subcategories,
+        'trip_types': trip_types
+    }])
+
+    return df_location_details
+

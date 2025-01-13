@@ -133,10 +133,14 @@ def getRestaurantsByType(city, typesOfRestaurants):
 
 
 def searchRestaurants(tripAdvRestName):
-    #Incomplete
+    '''
+    
+    '''
     place = gmaps.geocode(tripAdvRestName)
     place_info = place[0]
     geo_results = place_info['geometry']
     geo_coordinates = geo_results['location']
     lat = geo_coordinates['lat']
     lng = geo_coordinates['lng']
+
+    return lat, lng

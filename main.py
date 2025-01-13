@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
         restaurants = maps.getRestaurantsByType(cidade, tipo_restaurante)
         util.insertDb(tableName='gmaps_restaurants', data=restaurants, dropDuplicatesBy = 'place_id')
-
+    
     # Get all the restaurant from TripAdvisor based on gmaps first search
     if update:
         query = "SELECT name, latitude, longitude FROM gmaps_restaurants"
@@ -31,4 +31,9 @@ if __name__ == "__main__":
                 reviews = rev.getReviews(locationId)
                 util.insertDb('ta_reviews', reviews, primaryKey='review_id')
     
-    
+    # Get all the reviews from TripAdvisor based on the location_id
+    query = "SELECT location_id FROM ta_location"
+    df = pd.read_sql(query, con=engine)
+    for row in df.itertuples():
+        reviews = rev.getReviews(row.location_id)
+        util.insertDb('ta_reviews', reviews, primaryKey='review_id')
