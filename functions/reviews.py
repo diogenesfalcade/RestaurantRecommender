@@ -152,12 +152,12 @@ def getReviews(locationId):
         'subrating_service': subrating_service,
         'subrating_food': subrating_food,
     })
-
+                           
     return df_reviews
 
 
 
-def getLocationDetails(locationId, api_key, lang="pt_BR"):
+def getLocationDetails(locationId):
     url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/details?key={api_key}&language={lang}&currency=BRL"
     headers = {"accept": "application/json"}
 
