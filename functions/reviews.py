@@ -210,7 +210,7 @@ def getLocationDetails(locationId):
     # Características, Culinárias, Categorias, Subcategorias, Tipos de Viagem (garante que seja lista)
     features = locationDetails.get('features', [])
     cuisines = [cuisine.get('localized_name', '') for cuisine in locationDetails.get('cuisine', [])]
-    categories = [category.get('localized_name', '') for category in locationDetails.get('category', [])]
+    category = locationDetails.get('category', {}).get('localized_name', '')
     subcategories = [subcategory.get('localized_name', '') for subcategory in locationDetails.get('subcategory', [])]
     trip_types = [tripType.get('localized_name', '') for tripType in locationDetails.get('trip_types', [])]
 
@@ -237,7 +237,7 @@ def getLocationDetails(locationId):
         'weekdays_opening_hours': weekdays_opening_hours,
         'features': features,
         'cuisines': cuisines,
-        'categories': categories,
+        'categories': category,
         'subcategories': subcategories,
         'trip_types': trip_types
     }])
