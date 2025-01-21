@@ -2,6 +2,7 @@ import pandas as pd
 import functions.locations_maps as maps
 import functions.utilities as util
 import functions.reviews as rev
+from tqdm import tqdm
 from sqlalchemy import create_engine
 
 update = False
@@ -44,10 +45,14 @@ if __name__ == "__main__":
             util.insertDb('ta_reviews', reviews, primaryKey='review_id')
 
     # Get location details from TripAdvisor based on the location_id
-    query = "select location_id from ta_location limit 100 "
+     
+    query = """select l.location_id from ta_location l
+                left join ta_location_details d on l.location_id = d.location_id 
+                where d.location_id is null
+                limit 100 """
+    
     df = pd.read_sql(query, con=engine)
-    for row in df.itertuples():
+    for row in tqdm(df.itertuples(), total=len(df), desc="Processing"):
         locationDetails = rev.getLocationDetails(row.location_id)
-        util.insertDb('ta_location_details', locationDetails, primaryKey='location_id')
-
+        locationDetails.to_sql('ta_location_details', con=engine, if_exists='append', index=False)
     

@@ -157,6 +157,10 @@ def getReviews(locationId):
 
 
 
+import requests
+import pandas as pd
+import psycopg2
+
 def getLocationDetails(locationId):
     url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/details?key={api_key}&language={lang}&currency=BRL"
     headers = {"accept": "application/json"}
@@ -164,14 +168,13 @@ def getLocationDetails(locationId):
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # Verifica se a requisição foi bem-sucedida
-        locationDetails = response.json()  # Converte diretamente para JSON
-
+        locationDetails = response.json()  # Converte diretamente para JSON 
     except requests.exceptions.RequestException as e:
         print(f"Erro ao buscar detalhes da localização {locationId}: {e}")
         return pd.DataFrame()  # Retorna um DataFrame vazio em caso de erro
 
-    # Extraindo os dados de forma segura
-    location_id = locationDetails.get('location_id', '')
+    # Extraindo os dados com conversão de tipos
+    location_id = int(locationDetails.get('location_id', 0))  # Garantir BIGINT
     name = locationDetails.get('name', '')
     description = locationDetails.get('description', '')
     email = locationDetails.get('email', '')
@@ -179,40 +182,47 @@ def getLocationDetails(locationId):
 
     # Ranking
     ranking_data = locationDetails.get('ranking_data', {})
-    ranking_position = ranking_data.get('ranking', '')
-    ranking_out_of = ranking_data.get('ranking_out_of', '')
+    ranking_position = int(ranking_data.get('ranking', 0)) if ranking_data.get('ranking') else None
+    ranking_out_of = int(ranking_data.get('ranking_out_of', 0)) if ranking_data.get('ranking_out_of') else None
 
     # Avaliações
-    rating = locationDetails.get('rating', '')
-    num_reviews = locationDetails.get('num_reviews', '')
+    rating = float(locationDetails.get('rating', 0.0))
+    num_reviews = int(locationDetails.get('num_reviews', 0))
 
     # Contagem de avaliações por nota (1 a 5 estrelas)
     review_rating = locationDetails.get('review_rating_count', {})
-    review_rating_1 = review_rating.get('1', '')
-    review_rating_2 = review_rating.get('2', '')
-    review_rating_3 = review_rating.get('3', '')
-    review_rating_4 = review_rating.get('4', '')
-    review_rating_5 = review_rating.get('5', '')
+    review_rating_1 = int(review_rating.get('1', 0))
+    review_rating_2 = int(review_rating.get('2', 0))
+    review_rating_3 = int(review_rating.get('3', 0))
+    review_rating_4 = int(review_rating.get('4', 0))
+    review_rating_5 = int(review_rating.get('5', 0))
 
-    # Subratings (Comida, Atendimento, Custo, etc.)
+    # Subratings
     subratings = locationDetails.get('subratings', {})
-    food_rating = subratings.get("0", {}).get("value", "")
-    service_rating = subratings.get("1", {}).get("value", "")
-    value_rating = subratings.get("2", {}).get("value", "")
+    food_rating = float(subratings.get("0", {}).get("value", 0.0))
+    service_rating = float(subratings.get("1", {}).get("value", 0.0))
+    value_rating = float(subratings.get("2", {}).get("value", 0.0))
 
     # Outras informações
     price_level = locationDetails.get('price_level', '')
 
-    # Horários de funcionamento (garante que seja lista)
+    # Horários de funcionamento
     hours = locationDetails.get('hours', {})
     weekdays_opening_hours = hours.get('weekday_text', [])
 
-    # Características, Culinárias, Categorias, Subcategorias, Tipos de Viagem (garante que seja lista)
+    # Características, Culinárias, Categorias, Subcategorias, Tipos de Viagem
     features = locationDetails.get('features', [])
     cuisines = [cuisine.get('localized_name', '') for cuisine in locationDetails.get('cuisine', [])]
     category = locationDetails.get('category', {}).get('localized_name', '')
     subcategories = [subcategory.get('localized_name', '') for subcategory in locationDetails.get('subcategory', [])]
     trip_types = [tripType.get('localized_name', '') for tripType in locationDetails.get('trip_types', [])]
+
+    # Convertendo as listas para o formato de array do PostgreSQL
+    features = '{' + ','.join(features) + '}' if isinstance(features, list) else features
+    cuisines = '{' + ','.join(cuisines) + '}' if isinstance(cuisines, list) else cuisines
+    category = '{' + category + '}' if isinstance(category, str) else category
+    subcategories = '{' + ','.join(subcategories) + '}' if isinstance(subcategories, list) else subcategories
+    trip_types = '{' + ','.join(trip_types) + '}' if isinstance(trip_types, list) else trip_types
 
     # Criando o DataFrame
     df_location_details = pd.DataFrame([{
@@ -243,4 +253,5 @@ def getLocationDetails(locationId):
     }])
 
     return df_location_details
+
 

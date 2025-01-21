@@ -109,7 +109,7 @@ def insertDb(tableName, data, dropDuplicatesBy=None, primaryKey=None):
         raise ValueError("A chave primária (primaryKey) deve ser especificada para gerenciar duplicatas.")
 
     temp_table = f"{tableName}_temp"
-    engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
+    engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres') 
 
     with engine.connect() as connection:
         try:
