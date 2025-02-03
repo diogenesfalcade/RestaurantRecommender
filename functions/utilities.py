@@ -1,9 +1,12 @@
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import ResultProxy
+from sqlalchemy.orm import sessionmaker
 from deep_translator import GoogleTranslator
 from nltk.tokenize import sent_tokenize
 import logging
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -139,3 +142,34 @@ def insertDb(tableName, data, dropDuplicatesBy=None, primaryKey=None):
             # Limpar tabela temporária
             connection.execute(text(f"DROP TABLE IF EXISTS {temp_table}"))
             logging.info(f"Tabela temporária '{temp_table}' descartada com sucesso.")
+
+
+def create_expanded_view():
+    # Conexão com o banco (modifique com suas credenciais)
+    db_url = "postgresql://postgres:manager@localhost:5432/postgres"
+    engine = create_engine(db_url, connect_args={"row_factory": lambda cursor, row: dict(cursor.description, row)})
+
+    # Colunas que serão expandidas
+    array_columns = ['features', 'cuisines', 'subcategories', 'trip_types']
+
+    # Início da consulta
+    query = "CREATE OR REPLACE VIEW expanded_location_details AS SELECT location_id"
+
+    # Conectando ao banco
+    with engine.connect() as connection:
+        for col in array_columns:
+            # Obter valores únicos de cada coluna
+            result = connection.execute(text(f"SELECT DISTINCT UNNEST({col}) AS value FROM ta_location_details"))
+            unique_values = [row['value'] for row in result]
+
+            # Adicionar uma coluna para cada valor único no array
+            for value in unique_values:
+                safe_value = value.replace("'", "''")  # Escapar apóstrofes no valor
+                query += f", ({col} @> ARRAY['{safe_value}']::text[]) AS {col}_{safe_value}"
+
+        # Finalizar a consulta
+        query += " FROM ta_location_details;"
+
+        # Executar a consulta para criar ou atualizar a view
+        connection.execute(text(query))
+        print("View 'expanded_location_details' criada/atualizada com sucesso.")
