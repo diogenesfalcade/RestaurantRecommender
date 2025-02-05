@@ -34,16 +34,16 @@ if __name__ == "__main__":
                 util.insertDb('ta_reviews', reviews, primaryKey='review_id')
     
     # Get all the reviews from TripAdvisor based on the location_id
-    if update:
-        query = """select distinct l.location_id from ta_location l
-                left join ta_reviews r on l.location_id = r.location_id
-                where r.review_id IS NULL 
-                limit 50
-                """
-        df = pd.read_sql(query, con=engine)
-        for row in df.itertuples():
-            reviews = rev.getReviews(row.location_id)
-            util.insertDb('ta_reviews', reviews, primaryKey='review_id')
+    # if update:
+    query = """select distinct l.location_id from ta_location l
+            left join ta_reviews r on l.location_id = r.location_id
+            where r.review_id IS NULL 
+            limit 200
+            """
+    df = pd.read_sql(query, con=engine)
+    for row in df.itertuples():
+        reviews = rev.getReviews(row.location_id)
+        util.insertDb('ta_reviews', reviews, primaryKey='review_id')
 
     # Get location details from TripAdvisor based on the location_id
     if update:
@@ -56,6 +56,5 @@ if __name__ == "__main__":
             for row in tqdm(df.itertuples(), total=len(df), desc="Processing"):
                 locationDetails = rev.getLocationDetails(row.location_id)
                 locationDetails.to_sql('ta_location_details', con=engine, if_exists='append', index=False)
-    
-    util.create_expanded_view()
+
             
