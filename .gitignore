@@ -1,2 +1,4 @@
 
 .codegpt
+pyenv/Lib/site-packages/torch/lib/dnnl.lib
+pyenv/Lib/site-packages/torch/lib/torch_cpu.dll
