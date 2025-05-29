@@ -174,7 +174,7 @@ def getLocationDetails(locationId):
         return pd.DataFrame()  # Retorna um DataFrame vazio em caso de erro
 
     # Extraindo os dados com conversão de tipos
-    location_id = int(locationDetails.get('location_id', 0))  # Garantir BIGINT
+    location_id = int(locationDetails.get('location_id', 0))
     name = locationDetails.get('name', '')
     description = locationDetails.get('description', '')
     email = locationDetails.get('email', '')
