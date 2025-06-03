@@ -1,41 +1,12 @@
 import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
 
-conn_string = "postgresql://postgres:manager@localhost:5432/postgres"
-db = create_engine(conn_string)
-
-query = """
-select 
-  "location_id","name", "ranking_position", "rating", "num_reviews", "food_rating", "service_rating", "value_rating", 
-  "price_level", "Pizza", "Entrega", "Italiana", "Para levar", "Serviço de mesa", "Acesso para cadeirantes", 
-  "Mexicana", "Brasileira", "Sul-americana", "Bufê", "Familiar", "Reservas", "Lugares para sentar", "Churrasco", "Serve bebida alcoólica", "Bar", 
-  "Bar completo", "Mesas ao ar livre", "Pub com cerveja artesanal", "Café", "Grega", "Americana", "Steakhouse", "Sushi", 
-  "Japonesa", "Asiática", "Estacionamento disponível", "Pub", "Lanchonete", "Vinho e cerveja", "Estacionamento na rua", "Chinesa", 
-  "Estacionamento com validação", "Discover", "Música ao vivo", "Frutos do mar", 
-  "Fusão", "Indiana", "Saudável", "Contemporânea", "Estacionamento com manobrista", "Internacional", "Mediterrânea", "Fast food", 
-  "Estacionamento privado grátis", "Libanesa", "Árabe", "Oriente Médio", "Grelhados", "Áreas de lazer", "Restaurantes que servem cerveja", 
-  "Argentina", "Restaurante com bar", "Wine Bar", "Europeia", "Calábria", "Sul da Itália", 
-  "Espanhola", "Delicatéssen", "Tailandesa", "Pub com restaurante", "Alemã", "Francesa", "Sopa", "Coreana", "Suíça", "Peruana", "Portuguesa", 
-  "Balcão externo", "Latina", "Australiana", "Polonesa", 
-  "Centro-americana", "Toscana", "Centro da Itália", "Lácio", "Romana", "Bares de esportes", "Asiática central", 
-  "Nepalesa", "Ucraniana", "Leste europeia", "Comida de rua", "Culinária de fusão japonesa",
-  "Clube de jazz", "Nápoles", "Campânia", "Comidas terapêuticas", "Catalunha",
-  "Monday_Open_Morning", "Monday_Open_Afternoon", "Monday_Open_Evening", "Monday_Open_Night", 
-  "Tuesday_Open_Morning", "Tuesday_Open_Afternoon", "Tuesday_Open_Evening", "Tuesday_Open_Night", 
-  "Wednesday_Open_Morning", "Wednesday_Open_Afternoon", "Wednesday_Open_Evening", "Wednesday_Open_Night", 
-  "Thursday_Open_Morning", "Thursday_Open_Afternoon", "Thursday_Open_Evening", "Thursday_Open_Night", 
-  "Friday_Open_Morning", "Friday_Open_Afternoon", "Friday_Open_Evening", "Friday_Open_Night", 
-  "Saturday_Open_Morning", "Saturday_Open_Afternoon", "Saturday_Open_Evening", "Saturday_Open_Night", 
-  "Sunday_Open_Morning", "Sunday_Open_Afternoon", "Sunday_Open_Evening", "Sunday_Open_Night" 
-from 
-  ta_features_expanded 
-"""
-
-df_orig = pd.read_sql(query, db)
+df_orig = pd.read_csv("df_high.csv")
+df_reviews = pd.read_csv("df_reviews.csv")
+df_websites = pd.read_csv("df_websites.csv")
 
 df_orig["price_level"] = df_orig["price_level"].fillna(2)
 df_orig.dropna()
@@ -74,16 +45,6 @@ X_pca = pca.fit_transform(X_scaled)
 # Filtra os restaurantes com categoria 'Alto' e 'Médio'
 df_high = df[df['rating_category'] != 'Baixo'].reset_index(drop=True)
 X_pca_high = X_pca[df['rating_category'] != 'Baixo']
-
-query = """
-select location_id, sentiment_label, rating from ta_reviews where sentiment_label is not null
-"""
-df_reviews = pd.read_sql(query, db)
-
-query_websites = """
-select name, location_id, website from ta_location_details
-"""
-df_websites = pd.read_sql(query_websites, db)
 
 # Mescla os websites com o dataframe df_high
 df_high = df_high.merge(df_websites[['location_id', 'website']], on='location_id', how='left')
