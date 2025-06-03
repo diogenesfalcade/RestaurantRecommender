@@ -2,8 +2,9 @@ import requests
 import json
 import pandas as pd
 import Levenshtein
+import os
 
-api_key = '64958C6CE3974BFA98E78B49E69F06B8'
+api_key = os.environ.get('TRIPADVISOR_KEY')
 lang = 'pt'
 
 def locationId(name, lat, long):

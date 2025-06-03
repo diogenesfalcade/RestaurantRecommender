@@ -1,8 +1,6 @@
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import ResultProxy
-from sqlalchemy.orm import sessionmaker
 from deep_translator import GoogleTranslator
 from nltk.tokenize import sent_tokenize
 import logging
@@ -77,18 +75,6 @@ def query(command):
             connection.close()
 
     return result
-
-# def insertDb(tableName, data, dropDuplicatesBy=None, method='append'):
-#     rest_df = pd.DataFrame(data)
-
-#     if dropDuplicatesBy and dropDuplicatesBy not in rest_df.columns:
-#         raise ValueError(f"Coluna '{dropDuplicatesBy}' não encontrada no DataFrame.")
-
-#     if dropDuplicatesBy:
-#         rest_df = rest_df.drop_duplicates(subset=[dropDuplicatesBy])
-
-#     engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
-#     rest_df.to_sql(tableName, con=engine, if_exists = method, index=False)
 
 def insertDb(tableName, data, dropDuplicatesBy=None, primaryKey=None):
     """
