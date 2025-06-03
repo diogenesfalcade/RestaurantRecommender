@@ -5,9 +5,15 @@ from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
 import pyarrow
 
-df_orig = pd.read_parquet("df_high.parquet")
-df_reviews = pd.read_parquet("df_reviews.parquet")
-df_websites = pd.read_parquet("df_websites.parquet")
+@st.cache_data
+def load_data():
+    df_orig = pd.read_parquet("df_high.parquet")
+    df_reviews = pd.read_parquet("df_reviews.parquet")
+    df_websites = pd.read_parquet("df_websites.parquet")
+    return df_high, df_reviews, df_websites
+
+df_orig, df_reviews, df_websites = load_data()
+
 
 df_orig["price_level"] = df_orig["price_level"].fillna(2)
 df_orig.dropna()
