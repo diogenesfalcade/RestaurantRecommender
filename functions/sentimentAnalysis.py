@@ -16,11 +16,11 @@ MODEL_NAME = "llama3"
 def classify_with_ollama(text):
     prompt = f"""Classifique o sentimento do texto abaixo e retorne APENAS um JSON com a chave "sentimento" e o valor: 'positivo', 'negativo' ou 'neutro'. Sem texto extra.
 
-Exemplo de saída: {{"sentimento": "positivo"}}
+    Exemplo de saída: {{"sentimento": "positivo"}}
 
-Texto:
-{text[:512]}
-"""
+    Texto:
+    {text[:512]}
+    """
     data = {
         "model": MODEL_NAME,
         "prompt": prompt,

@@ -157,11 +157,6 @@ def getReviews(locationId):
     return df_reviews
 
 
-
-import requests
-import pandas as pd
-import psycopg2
-
 def getLocationDetails(locationId):
     url = f"https://api.content.tripadvisor.com/api/v1/location/{locationId}/details?key={api_key}&language={lang}&currency=BRL"
     headers = {"accept": "application/json"}
