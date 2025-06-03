@@ -11,7 +11,7 @@ engine = create_engine('postgresql://postgres:manager@localhost:5432/postgres')
 
 if __name__ == "__main__":
 
-    # Get locations from gmaps api -> Around 900 restaurants
+    # Get locations from gmaps api
     if update:
         cidade = 'Curitiba'
         tipo_restaurante = ['tradicional', 'mexicana', 'latino', 'hamburger', 'pizzaria', 'alta gastronomia', 'americano', 'italiano', 
