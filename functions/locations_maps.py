@@ -1,9 +1,11 @@
 import googlemaps
 import time
-import pandas as pd
-from sqlalchemy import create_engine
+import os
 
-gmaps = googlemaps.Client(key='AIzaSyB0NvzEDi2PqEI4CDO_Ys_Z0cYM1CFhNvA')
+api_key = os.environ.get('GMAPS_KEY')
+
+gmaps = googlemaps.Client(key=api_key)
+
 
 def restaurantResponse(responseItem, tag: str):
     ''' 
