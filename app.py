@@ -3,10 +3,11 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
+import pyarrow
 
-df_orig = pd.read_csv("df_high.csv")
-df_reviews = pd.read_csv("df_reviews.csv")
-df_websites = pd.read_csv("df_websites.csv")
+df_orig = pd.read_parquet("df_high.parquet")
+df_reviews = pd.read_parquet("df_reviews.parquet")
+df_websites = pd.read_parquet("df_websites.parquet")
 
 df_orig["price_level"] = df_orig["price_level"].fillna(2)
 df_orig.dropna()
