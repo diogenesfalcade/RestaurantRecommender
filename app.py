@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pyarrow
 
 @st.cache_data
 def load_data():
