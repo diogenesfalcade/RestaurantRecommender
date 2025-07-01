@@ -26,7 +26,7 @@ def exibir_recomendacoes(top5_df, novidades_df=None):
             price_level_str = format_price_level(row["price_level"])
             st.markdown(
                 f"""
-                <div style='background-color: #1f1f1f; padding: 10px; border-radius: 10px; text-align: center; height: 100%;'>
+                <div style='background-color: #1f1f1f; padding: 10px; border-radius: 10px; text-align: center;'>
                     <h4 style='color: #f63366;'><a href="{row['website']}" target="_blank" style='color: #f63366; text-decoration: none;'>{row['name']}</a></h4>
                     <p>⭐ {row['rating']}</p>
                     <p>📈 Reviews: {row['num_reviews']}</p>
@@ -45,7 +45,7 @@ def exibir_recomendacoes(top5_df, novidades_df=None):
                 price_level_str = format_price_level(row["price_level"])
                 st.markdown(
                     f"""
-                    <div style='background-color: #1f1f1f; padding: 10px; border-radius: 10px; text-align: center; height: 100%;'>
+                    <div style='background-color: #1f1f1f; padding: 5px; border-radius: 10px; text-align: center;'>
                         <h4 style='color: #f63366;'><a href="{row['website']}" target="_blank" style='color: #f63366; text-decoration: none;'>{row['name']}</a></h4>
                         <p>⭐ {row['rating']}</p>
                         <p>📈 Reviews: {row['num_reviews']}</p>
@@ -58,43 +58,24 @@ def exibir_recomendacoes(top5_df, novidades_df=None):
 # Streamlit Interface
 st.title("Recomendador de restaurantes")
 
-# A seleção continua por nome, pois é mais amigável ao usuário
-# Usamos drop_duplicates para evitar nomes repetidos no selectbox, selecionando o primeiro como referência
-opcoes = sorted(df_ready.drop_duplicates(subset=['name'])['name'].unique())
+opcoes = df_ready['name'].unique()
 restaurante_base = st.selectbox("Escolha um restaurante que goste e conheça", opcoes)
 
 if st.button("Recomendar"):
-    # Encontra a primeira ocorrência do restaurante selecionado e pega sua linha inteira
-    linha_base = df_ready[df_ready['name'] == restaurante_base].iloc[0]
+    linha = df_ready[df_ready['name'] == restaurante_base].iloc[0]
+    nomes_recomendados = [linha[f"recom_{i}"] for i in range(1, 6)]
+    df_top5 = df_ready[df_ready['name'].isin(nomes_recomendados)]
 
-    # Pega os IDs das recomendações das colunas 'recom_i'
-    ids_recomendados = [linha_base[f"recom_{i}"] for i in range(1, 6)]
-    
-    # Filtra o DataFrame para encontrar os restaurantes com base em seus IDs únicos
-    df_top5 = df_ready[df_ready['location_id'].isin(ids_recomendados)]
-
-    # Sugestões Adicionais
+    # Sugestões adicionais
     top100 = df_ready[df_ready['ranking'] <= 100]
-    
-    # Garante que as sugestões do top100 não estejam já na lista principal de recomendados, usando ID
-    top100_filtrado = top100[~top100['location_id'].isin(ids_recomendados)]
-    # Garante que haja amostras suficientes para sortear
-    num_amostras = min(2, len(top100_filtrado))
-    novidades_top100 = top100_filtrado.sample(n=num_amostras, random_state=None)
+    top100 = top100[~top100['name'].isin(nomes_recomendados)]
+    novidades_top100 = top100.sample(n=2, random_state=None)
 
-    # Cria uma lista de IDs a serem excluídos da próxima busca (Top 5 + novidades do Top 100)
-    ids_excluidos = ids_recomendados + novidades_top100['location_id'].tolist()
-
-    # Filtra para encontrar uma "joia escondida" (poucos reviews), usando a lista de IDs excluídos
-    candidatos_extra = df_ready[
+    excluidos = nomes_recomendados + novidades_top100['name'].tolist()
+    novidade_extra = df_ready[
         (df_ready['num_reviews'] < 100) &
-        (~df_ready['location_id'].isin(ids_excluidos))
-    ]
-    novidade_extra = pd.DataFrame() # Inicia um DataFrame vazio
-    if not candidatos_extra.empty:
-        novidade_extra = candidatos_extra.sample(n=1, random_state=None)
+        (~df_ready['name'].isin(excluidos))
+        ].sample(n=1, random_state=None)
 
-    # Combina as novidades em um único DataFrame
     novidades_df = pd.concat([novidades_top100, novidade_extra])
-    
     exibir_recomendacoes(df_top5, novidades_df)
