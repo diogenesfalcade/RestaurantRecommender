@@ -1,4 +1,12 @@
-
 .codegpt
 pyenv/Lib/site-packages/torch/lib/dnnl.lib
 pyenv/Lib/site-packages/torch/lib/torch_cpu.dll
+pyvenv/
+.pyvenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vscode/
+.idea/
+.DS_Store
