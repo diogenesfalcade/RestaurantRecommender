@@ -1,6 +1,25 @@
-streamlit
-psycopg2-binary
-scikit-learn
-pandas
-numpy
-pyarrow
+# Core de Análise e Dados
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.6.1
+
+# Banco de Dados
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+
+# Interface Web
+streamlit==1.44.1
+
+# APIs e Web
+googlemaps==4.10.0
+requests==2.32.3
+
+# Processamento de Linguagem e Utilitários
+deep-translator==1.11.4
+nltk==3.9.1
+tqdm==4.67.0
+Levenshtein==0.26.1
+
+# Visualização de Dados
+matplotlib==3.10.1
+seaborn==0.13.2
